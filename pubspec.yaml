@@ -36,6 +36,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  firebase_core: ^3.6.0   # Flutter アプリで Firebase を利用するための基本パッケージ
+  cloud_firestore: ^5.4.4 # cloud firestoreを利用するためのパッケージ
+  firebase_auth: ^5.3.1   #firebase authentication を利用するためのパッケージ。
+  flutter_local_notifications: ^17.2.4 #ローカル通知を表示させるパッケージ。
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

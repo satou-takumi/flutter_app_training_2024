@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();  // Firebaseの初期化
+    print("Firebase Initialized!");
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
   runApp(const MyApp());
 }
 

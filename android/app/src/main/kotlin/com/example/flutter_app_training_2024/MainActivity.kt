@@ -1,4 +1,4 @@
-package com.example.flutter_app_training_2024
+package com.takumi.myapp
 
 import io.flutter.embedding.android.FlutterActivity
 
