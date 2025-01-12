@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'front_end/add_event.dart';
+import 'front_end/edit_event.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _events[eventDate] = [];
                           }
                           _events[eventDate]?.add(newEvent); // 新しいイベントを追加
-                      });
+                        });
                       }
                     },
                     child: Text("+ イベントを追加"),
@@ -88,8 +89,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 // イベントリストアイテム
                 return ListTile(
                   title: Text(selectedEvents[index]),
-                  onTap: () {
-                    // 編集画面への遷移（未実装）
+                  onTap: () async {
+                    // 編集画面への遷移
+                    final updatedEvent = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditEventScreen(
+                          eventTitle: selectedEvents[index], // 編集対象のイベント名
+                          onDelete: () {
+                            setState(() {
+                              selectedEvents.removeAt(index); // 削除処理
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                    if (updatedEvent != null && updatedEvent.isNotEmpty) {
+                      setState(() {
+                        selectedEvents[index] = updatedEvent; // イベント名を更新
+                      });
+                    }
                   },
                 );
               },
