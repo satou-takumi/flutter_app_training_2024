@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'front_end/add_event.dart';
 import 'front_end/edit_event.dart';
+import 'back_end/firestore_service.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,9 +16,31 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   Map<DateTime, List<String>> _events = {
-    DateTime(2025, 1, 1): ['たき火祭り', 'POP UP'],
-    DateTime(2025, 1, 2): ['吹奏楽部演奏会'],
+    /*DateTime(2025, 1, 1): ['たき火祭り', 'POP UP'],
+    DateTime(2025, 1, 2): ['吹奏楽部演奏会'],*/
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents(); // Firestoreからイベントを取得
+  }
+
+  Future<void> _loadEvents() async {
+    FirestoreService firestoreService = FirestoreService();
+    List<Map<String, dynamic>> events = await firestoreService.fetchEvents();
+
+    setState(() {
+      for (var event in events) {
+        DateTime eventDate = DateTime.parse(event['date']);
+        if (_events[eventDate] == null) {
+          _events[eventDate] = [];
+        }
+        _events[eventDate]?.add(event['title']);
+      }
+    });
+  }
+  
   // 日付を正規化する関数（カレンダーと整合性を合わせる）
   DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
