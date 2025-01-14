@@ -86,8 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(  
                           builder: (context) => AddEventScreen(
-                            selectedDate: _normalizeDate(_selectedDay ?? _focusedDay,
-                            ), // 選択された日付を渡す
+                            // 選択された日付を渡す
+                            selectedDate: _normalizeDate(_selectedDay ?? _focusedDay), 
                           ),
                         ),
                       );
@@ -95,14 +95,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 新しいイベントが追加された場合
                       if (newEvent != null) {
                         FirestoreService firestoreService = FirestoreService();
-                        await firestoreService.addEvent(newEvent); // Firestoreに保存
+
+                        // Firestoreにイベントを追加し、ドキュメント参照を取得
+                        final docRef = await firestoreService.addEvent(newEvent);
+                        final docId = docRef.id; // ドキュメントIDを取得
 
                         setState(() {
                           final eventDate = _normalizeDate(_selectedDay ?? _focusedDay);
                           if (_events[eventDate] == null) {
                             _events[eventDate] = [];
                           }
-                          _events[eventDate]?.add(newEvent); // ローカル状態を更新
+                          // ローカル状態の更新（FirestoreのドキュメントIDを保存も行う）
+                          _events[eventDate]?.add({
+                            ...newEvent,
+                            'id': docId, // ドキュメントIDを追加
+                          }); 
                         });
                       }
                     },
@@ -116,10 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('開始: ${event['startTime'] ?? ''}'),
-                      Text('終了: ${event['endTime'] ?? ''}'),
-                      Text('場所: ${event['location'] ?? ''}'),
-                      Text('メモ: ${event['memo'] ?? ''}'),
+                      Text('開始: ${event['startTime'] ?? '**:**'}'),
+                      Text('終了: ${event['endTime'] ?? '**:**'}'),
+                      Text('場所: ${event['location'] ?? '***'}'),
+                      Text('メモ: ${event['memo'] ?? '***'}'),
                     ],
                   ),
                   onTap: () async {
@@ -129,16 +136,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       MaterialPageRoute(
                         builder: (context) => EditEventScreen(
                           eventData: event,
-                          onSave: (updatedData) {
+                          onSave: (updatedData) async {
+                            FirestoreService firestoreService = FirestoreService();
+
+                            // Firestore にイベントを更新
+                            if(event['id'] != null){
+                              await firestoreService.updateEvent(event['id'], updatedData); 
+                            }
                             setState(() {
-                              event['title'] = updatedData['title'];
-                              event['startTime'] = updatedData['startTime'];
-                              event['endTime'] = updatedData['endTime'];
-                              event['location'] = updatedData['location'];
-                              event['memo'] = updatedData['memo'];
+                              event['title'] = updatedData['title'] ?? '***'; // nullに対応
+                              event['startTime'] = updatedData['startTime'] ?? '**:**';
+                              event['endTime'] = updatedData['endTime'] ?? '**:**';
+                              event['location'] = updatedData['location'] ?? '***';
+                              event['memo'] = updatedData['memo'] ?? '***';
                             });
                           },
-                          onDelete: () {
+                          onDelete: () async {
+                            FirestoreService firestoreService = FirestoreService();
+
+                            // Firestoreからイベントを削除
+                            if (event['id'] != null) {
+                              await firestoreService.deleteEvent(event['id']); 
+                            }
                             setState(() {
                               selectedEvents.removeAt(index); // 削除処理
                             });
@@ -161,37 +180,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-                /*return ListTile(
-                  title: Text(selectedEvents[index]),
-                  onTap: () async {
-                    // 編集画面への遷移
-                    final updatedEvent = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditEventScreen(
-                          eventTitle: selectedEvents[index], // 編集対象のイベント名
-                          onDelete: () {
-                            setState(() {
-                              selectedEvents.removeAt(index); // 削除処理
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                    if (updatedEvent != null && updatedEvent.isNotEmpty) {
-                      setState(() {
-                        selectedEvents[index] = updatedEvent; // イベント名を更新
-                      });
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-*/

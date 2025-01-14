@@ -16,8 +16,27 @@ class FirestoreService {
     }
   }
   // イベント情報をFirestoreへ保存
-  Future<void> addEvent(Map<String, dynamic> event) async {
-  await FirebaseFirestore.instance.collection('events').add(event);
-}
+  Future<DocumentReference<Map<String, dynamic>>> addEvent(Map<String, dynamic> event) async {
+    final docRef = FirebaseFirestore.instance.collection('events').doc(); // ドキュメント参照を生成
+    await docRef.set({
+      ...event,
+      'id': docRef.id // ドキュメントIDを追加
+    });
+    return docRef; // ドキュメント参照を返す
+  }
 
+  // イベントの更新
+  Future<void> updateEvent(String eventId, Map<String, dynamic> updatedData) async {
+    await FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventId)
+        .update(updatedData);
+  }
+  // イベントの削除
+  Future<void> deleteEvent(String eventId) async {
+    await FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventId)
+        .delete();
+  }
 }
