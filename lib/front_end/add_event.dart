@@ -13,6 +13,10 @@ class AddEventScreen extends StatefulWidget {
 
 class _AddEventScreenState extends State<AddEventScreen> {
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _startTimeController = TextEditingController();
+  final TextEditingController _endTimeController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _memoController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +41,51 @@ class _AddEventScreenState extends State<AddEventScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
+            TextField(
+              controller: _startTimeController,
+              decoration: InputDecoration(
+                labelText: '開始時間 (例: 10:00)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _endTimeController,
+              decoration: InputDecoration(
+                labelText: '終了時間 (例: 12:00)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _locationController,
+              decoration: InputDecoration(
+                labelText: '場所',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _memoController,
+              decoration: InputDecoration(
+                labelText: 'メモ',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 if (_titleController.text.isNotEmpty) {
-                  Navigator.pop(context, _titleController.text); // 入力値を返す
+                  final newEvent = {
+                    'title': _titleController.text,
+                    'startTime': _startTimeController.text,
+                    'endTime': _endTimeController.text,
+                    'location': _locationController.text,
+                    'memo': _memoController.text,
+                    'date': widget.selectedDate.toIso8601String(),
+                  };
+                  Navigator.pop(context, newEvent); // 入力データを戻す
+                  //Navigator.pop(context, _titleController.text); // 入力値を返す
                 }
               },
               child: Text('保存'),

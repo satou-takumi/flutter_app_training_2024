@@ -15,4 +15,9 @@ class FirestoreService {
       return [];
     }
   }
+  // イベント情報をFirestoreへ保存
+  Future<void> addEvent(Map<String, dynamic> event) async {
+  await FirebaseFirestore.instance.collection('events').add(event);
+}
+
 }

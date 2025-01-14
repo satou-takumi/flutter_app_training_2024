@@ -94,18 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // 新しいイベントが追加された場合
                       if (newEvent != null) {
+                        FirestoreService firestoreService = FirestoreService();
+                        await firestoreService.addEvent(newEvent); // Firestoreに保存
+
                         setState(() {
                           final eventDate = _normalizeDate(_selectedDay ?? _focusedDay);
                           if (_events[eventDate] == null) {
                             _events[eventDate] = [];
                           }
-                          _events[eventDate]?.add({
-                            'title': newEvent,
-                            'startTime': '',
-                            'endTime': '',
-                            'location': '',
-                            'memo': ''
-                          });
+                          _events[eventDate]?.add(newEvent); // ローカル状態を更新
                         });
                       }
                     },
