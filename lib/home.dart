@@ -15,10 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<String>> _events = {
-    /*DateTime(2025, 1, 1): ['たき火祭り', 'POP UP'],
-    DateTime(2025, 1, 2): ['吹奏楽部演奏会'],*/
-  };
+  Map<DateTime, List<Map<String,dynamic>>> _events = {};
 
   @override
   void initState() {
@@ -36,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_events[eventDate] == null) {
           _events[eventDate] = [];
         }
-        _events[eventDate]?.add(event['title']);
+        _events[eventDate]?.add(event);
       }
     });
   }
@@ -49,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // 選択された日のイベントを取得(日付を正規化)
-    List<String> selectedEvents =
+    List<Map<String,dynamic>> selectedEvents =
         _events[_normalizeDate(_selectedDay ?? _focusedDay)] ?? []; 
 
     return Scaffold(
@@ -72,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             eventLoader: (day) {
-              return _events[_normalizeDate(day)] ?? [];
+              return _events[_normalizeDate(day)]?.map((e) => e['title'] ?? '').toList() ?? [];
             },
           ),
           const SizedBox(height: 16.0),
@@ -95,14 +92,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
 
-                      // 新しいイベントが追加されたと場合
+                      // 新しいイベントが追加された場合
                       if (newEvent != null) {
                         setState(() {
                           final eventDate = _normalizeDate(_selectedDay ?? _focusedDay);
                           if (_events[eventDate] == null) {
                             _events[eventDate] = [];
                           }
-                          _events[eventDate]?.add(newEvent); // 新しいイベントを追加
+                          _events[eventDate]?.add({
+                            'title': newEvent,
+                            'startTime': '',
+                            'endTime': '',
+                            'location': '',
+                            'memo': ''
+                          });
                         });
                       }
                     },
@@ -110,7 +113,58 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
                 // イベントリストアイテム
+                final event = selectedEvents[index];
                 return ListTile(
+                  title: Text(event['title'] ?? ''),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('開始: ${event['startTime'] ?? ''}'),
+                      Text('終了: ${event['endTime'] ?? ''}'),
+                      Text('場所: ${event['location'] ?? ''}'),
+                      Text('メモ: ${event['memo'] ?? ''}'),
+                    ],
+                  ),
+                  onTap: () async {
+                    // 編集画面へ遷移
+                    final updatedEvent = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditEventScreen(
+                          eventData: event,
+                          onSave: (updatedData) {
+                            setState(() {
+                              event['title'] = updatedData['title'];
+                              event['startTime'] = updatedData['startTime'];
+                              event['endTime'] = updatedData['endTime'];
+                              event['location'] = updatedData['location'];
+                              event['memo'] = updatedData['memo'];
+                            });
+                          },
+                          onDelete: () {
+                            setState(() {
+                              selectedEvents.removeAt(index); // 削除処理
+                            });
+                          }
+                        ),
+                      ),
+                    );
+                    if (updatedEvent != null && updatedEvent.isNotEmpty) {
+                        setState(() {
+                          selectedEvents[index] = updatedEvent; // イベント名を更新
+                        });
+                    }
+                  },
+                );
+              }
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+                /*return ListTile(
                   title: Text(selectedEvents[index]),
                   onTap: () async {
                     // 編集画面への遷移
@@ -143,3 +197,4 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+*/
