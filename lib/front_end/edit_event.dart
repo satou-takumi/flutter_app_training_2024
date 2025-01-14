@@ -108,7 +108,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       'startTime': _startTimeController.text,
                       'endTime': _endTimeController.text,
                       'location': _locationController.text,
-                    'memo': _memoController.text,
+                      'memo': _memoController.text,
                     };
                     widget.onSave(updatedData); // 保存処理を実行
                     Navigator.pop(context); // 前の画面に戻る
