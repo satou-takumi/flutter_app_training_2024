@@ -144,65 +144,100 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       }
                     },
-                    child: Text("+ イベントを追加"),
+                    child: Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: Colors.blue),
+                      ),
+                      child: Text(
+                        "+ イベントを追加",
+                        style: TextStyle(fontSize: 16.0, color: Colors.blue),
+                      ),
+                    ),
                   );
                 }
                 // イベントリストアイテム
                 final event = selectedEvents[index];
-                return ListTile(
-                  tileColor: event['type'] == 'admin' ? Colors.red.shade50 : Colors.teal.shade50, // 背景色を変更
-                  title: Text(event['title'] ?? ''),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('開始: ${event['startTime'] ?? '**:**'}'),
-                      Text('終了: ${event['endTime'] ?? '**:**'}'),
-                      Text('場所: ${event['location'] ?? '***'}'),
-                      Text('メモ: ${event['memo'] ?? '***'}'),
-                    ],
-                  ),
-                  onTap: () async {
-                    // 編集画面へ遷移
-                    final updatedEvent = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditEventScreen(
-                          eventData: event,
-                          onSave: (updatedData) async {
-                            FirestoreService firestoreService = FirestoreService();
+                  return InkWell(
+                    onTap: () async {
+                      // 編集画面へ遷移
+                      final updatedEvent = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditEventScreen(
+                            eventData: event,
+                            onSave: (updatedData) async {
+                              FirestoreService firestoreService = FirestoreService();
 
-                            // Firestore にイベントを更新
-                            if(event['id'] != null){
-                              await firestoreService.updateEvent(event['id'], updatedData); 
-                            }
-                            setState(() {
-                              event['title'] = updatedData['title'] ?? '***'; // nullに対応
-                              event['startTime'] = updatedData['startTime'] ?? '**:**';
-                              event['endTime'] = updatedData['endTime'] ?? '**:**';
-                              event['location'] = updatedData['location'] ?? '***';
-                              event['memo'] = updatedData['memo'] ?? '***';
-                            });
-                          },
-                          onDelete: () async {
-                            FirestoreService firestoreService = FirestoreService();
+                              // Firestore にイベントを更新
+                              if(event['id'] != null){
+                                await firestoreService.updateEvent(event['id'], updatedData); 
+                              }
+                              setState(() {
+                                event['title'] = updatedData['title'] ?? '***'; // nullに対応
+                                event['startTime'] = updatedData['startTime'] ?? '**:**';
+                                event['endTime'] = updatedData['endTime'] ?? '**:**';
+                                event['location'] = updatedData['location'] ?? '***';
+                                event['memo'] = updatedData['memo'] ?? '***';
+                              });
+                            },
+                            onDelete: () async {
+                              FirestoreService firestoreService = FirestoreService();
 
-                            // Firestoreからイベントを削除
-                            if (event['id'] != null) {
-                              await firestoreService.deleteEvent(event['id']); 
+                              // Firestoreからイベントを削除
+                              if (event['id'] != null) {
+                                await firestoreService.deleteEvent(event['id']); 
+                              }
+                              setState(() {
+                                selectedEvents.removeAt(index); // 削除処理
+                              });
                             }
-                            setState(() {
-                              selectedEvents.removeAt(index); // 削除処理
-                            });
-                          }
+                          ),
                         ),
-                      ),
-                    );
+                      );
                     if (updatedEvent != null && updatedEvent.isNotEmpty) {
                         setState(() {
                           selectedEvents[index] = updatedEvent; // イベント名を更新
                         });
                     }
                   },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: event['type'] == 'admin' ? Colors.red.shade50 : Colors.teal.shade50,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event['startTime'] ?? '**:**',
+                              style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              event['endTime'] ?? '**:**',
+                              style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                            ),
+                          ], 
+                        ),
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Text(
+                            event['title'] ?? 'イベント名',
+                            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               }
             ),
