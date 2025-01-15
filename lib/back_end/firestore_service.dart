@@ -9,7 +9,11 @@ class FirestoreService {
   Future<List<Map<String, dynamic>>> fetchEvents() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('events').get();
-      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      return snapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      data['id'] = doc.id; // IDを追加
+      return data;
+    }).toList();
     } catch (e) {
       print('Firestoreからのデータ取得中にエラー: $e');
       return [];

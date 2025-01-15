@@ -69,8 +69,33 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             eventLoader: (day) {
-              return _events[_normalizeDate(day)]?.map((e) => e['title'] ?? '').toList() ?? [];
+              final events = _events[_normalizeDate(day)] ?? [];
+              return events.map((event) => event).toList();
             },
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: events.map((event) {
+                      if (event != null && event is Map<String, dynamic>) { // nullチェックと型確認
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                          width: 7.0,
+                          height: 7.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: event['type'] == 'admin' ? Colors.red : Colors.teal, // typeによって丸の色を変更
+                          ),
+                        );
+                      }
+                      return SizedBox.shrink(); // null や無効なデータの場合は空のウィジェットを返す
+                    }).toList(),
+                  );
+                }
+                return null;
+              },
+            ),
           ),
           const SizedBox(height: 16.0),
           Expanded(
@@ -96,8 +121,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (newEvent != null) {
                         FirestoreService firestoreService = FirestoreService();
 
+                        // `type`を付与してFirestoreに保存
+                        final Map<String, dynamic> eventWithType = {
+                          ...newEvent,
+                          'type': 'user', // ユーザが追加したイベントの識別用
+                        };
+
                         // Firestoreにイベントを追加し、ドキュメント参照を取得
-                        final docRef = await firestoreService.addEvent(newEvent);
+                        final docRef = await firestoreService.addEvent(eventWithType);
                         final docId = docRef.id; // ドキュメントIDを取得
 
                         setState(() {
@@ -107,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           // ローカル状態の更新（FirestoreのドキュメントIDを保存も行う）
                           _events[eventDate]?.add({
-                            ...newEvent,
+                            ...eventWithType,
                             'id': docId, // ドキュメントIDを追加
                           }); 
                         });
@@ -119,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // イベントリストアイテム
                 final event = selectedEvents[index];
                 return ListTile(
+                  tileColor: event['type'] == 'admin' ? Colors.red.shade50 : Colors.teal.shade50, // 背景色を変更
                   title: Text(event['title'] ?? ''),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
