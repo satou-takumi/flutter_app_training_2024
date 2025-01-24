@@ -2,22 +2,22 @@
 
 import 'package:flutter/material.dart';
 
-class EditEventScreen extends StatefulWidget {
+class EditEvent extends StatefulWidget {
   final Map<String, dynamic> eventData; // 編集するイベントのデータ
   final Function(Map<String, dynamic>) onSave; // 保存時のコールバック関数
   final VoidCallback onDelete; // 削除時のコールバック関数
 
-  EditEventScreen({
+  EditEvent({
     required this.eventData, 
     required this.onSave,
     required this.onDelete
   });
 
   @override
-  _EditEventScreenState createState() => _EditEventScreenState();
+  _EditEventState createState() => _EditEventState();
 }
 
-class _EditEventScreenState extends State<EditEventScreen> {
+class _EditEventState extends State<EditEvent> {
   // 各項目用のテキストコントローラー
   late TextEditingController _titleController;
   late TextEditingController _startTimeController;

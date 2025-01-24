@@ -7,12 +7,12 @@ import 'front_end/add_event.dart';
 import 'front_end/edit_event.dart';
 import 'back_end/firestore_service.dart';
 
-class HomeScreen extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeState createState() => _HomeState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeState extends State<Home> {
   DateTime _focusedDay = DateTime.now(); // 表示している日付
   DateTime? _selectedDay; // 選択した日付
   Map<DateTime, List<Map<String,dynamic>>> _events = {};// 日付ごとのイベントリストを管理する変数
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final newEvent = await Navigator.push(
                         context,
                         MaterialPageRoute(  
-                          builder: (context) => AddEventScreen(
+                          builder: (context) => AddEvent(
                             // 選択された日付を渡す
                             selectedDate: _normalizeDate(_selectedDay ?? _focusedDay), 
                           ),
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final updatedEvent = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditEventScreen(
+                          builder: (context) => EditEvent(
                             eventData: event,
                             onSave: (updatedData) async {
                               FirestoreService firestoreService = FirestoreService();

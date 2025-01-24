@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: HomeScreen(),// 初期画面を指定　//const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Home(),// 初期画面を指定　//const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

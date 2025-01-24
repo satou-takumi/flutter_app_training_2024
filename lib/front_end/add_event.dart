@@ -2,18 +2,18 @@
 
 import 'package:flutter/material.dart';
 
-class AddEventScreen extends StatefulWidget {
+class AddEvent extends StatefulWidget {
   final DateTime selectedDate; // 選択された日付が入る変数
 
-  AddEventScreen({
+  AddEvent({
     required this.selectedDate
     });
 
   @override
-  _AddEventScreenState createState() => _AddEventScreenState();
+  _AddEventState createState() => _AddEventState();
 }
 
-class _AddEventScreenState extends State<AddEventScreen> {
+class _AddEventState extends State<AddEvent> {
   // 各項目用のテキストコントローラー
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
