@@ -18,6 +18,7 @@ class EditEventScreen extends StatefulWidget {
 }
 
 class _EditEventScreenState extends State<EditEventScreen> {
+  // 各項目用のテキストコントローラー
   late TextEditingController _titleController;
   late TextEditingController _startTimeController;
   late TextEditingController _endTimeController;
@@ -28,6 +29,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   @override
   void initState() {
     super.initState();
+    // 各コントローラーへデータ取得
     _titleController = TextEditingController(text: widget.eventData['title']);
     _startTimeController =
         TextEditingController(text: widget.eventData['startTime']);
@@ -38,6 +40,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   @override
   void dispose() {
+    // 使用が終わったコントローラーの開放
     _titleController.dispose();
     _startTimeController.dispose();
     _endTimeController.dispose();
@@ -54,6 +57,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
+            // 削除ボタン
             onPressed: () {
               widget.onDelete(); // 削除処理を実行
               Navigator.pop(context); // 前の画面に戻る
@@ -102,6 +106,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                   child: Text('削除'),
                 ),
                 ElevatedButton(
+                  // 保存ボタン（更新内容を保存）
                   onPressed: () {
                     final updatedData = {
                       'title': _titleController.text,

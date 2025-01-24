@@ -13,9 +13,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  Map<DateTime, List<Map<String,dynamic>>> _events = {};
+  DateTime _focusedDay = DateTime.now(); // 表示している日付
+  DateTime? _selectedDay; // 選択した日付
+  Map<DateTime, List<Map<String,dynamic>>> _events = {};// 日付ごとのイベントリストを管理する変数
 
   @override
   void initState() {
@@ -25,9 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadEvents() async {
     FirestoreService firestoreService = FirestoreService();
+    
+    // イベント情報を取得
     List<Map<String, dynamic>> events = await firestoreService.fetchEvents();
 
     setState(() {
+      // Firestoreから取得したデータを_eventsに格納
       for (var event in events) {
         DateTime eventDate = DateTime.parse(event['date']);
         if (_events[eventDate] == null) {
@@ -59,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           TableCalendar(
             focusedDay: _focusedDay,
             firstDay: DateTime(2020, 1, 1),
-            lastDay: DateTime(2030, 12, 31),
+            lastDay: DateTime(2030, 12, 31),// カレンダーの範囲
             calendarFormat: CalendarFormat.month,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
@@ -76,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
                   return Row(
+                    // カレンダー上の丸の表示
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: events.map((event) {
                       if (event != null && event is Map<String, dynamic>) { // nullチェックと型確認
@@ -127,16 +131,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           'type': 'user', // ユーザが追加したイベントの識別用
                         };
 
-                        // Firestoreにイベントを追加し、ドキュメント参照を取得
+                        // Firestoreにイベントを追加し、ドキュメントIDを取得
                         final docRef = await firestoreService.addEvent(eventWithType);
                         final docId = docRef.id; // ドキュメントIDを取得
 
                         setState(() {
+                          // 新しいイベントが追加されたときに、その情報を_eventsへ格納
                           final eventDate = _normalizeDate(_selectedDay ?? _focusedDay);
                           if (_events[eventDate] == null) {
                             _events[eventDate] = [];
                           }
-                          // ローカル状態の更新（FirestoreのドキュメントIDを保存も行う）
+                          // ローカル状態の更新（FirestoreドキュメントIDの保存も行う）
                           _events[eventDate]?.add({
                             ...eventWithType,
                             'id': docId, // ドキュメントIDを追加
@@ -178,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 await firestoreService.updateEvent(event['id'], updatedData); 
                               }
                               setState(() {
+                                // イベント内容が更新されたときに更新して反映
                                 event['title'] = updatedData['title'] ?? '***'; // nullに対応
                                 event['startTime'] = updatedData['startTime'] ?? '**:**';
                                 event['endTime'] = updatedData['endTime'] ?? '**:**';
@@ -209,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
+                      // 運営が追加したイベントの判別
                       color: event['type'] == 'admin' ? Colors.red.shade50 : Colors.teal.shade50,
                       borderRadius: BorderRadius.circular(8.0),
                     ),

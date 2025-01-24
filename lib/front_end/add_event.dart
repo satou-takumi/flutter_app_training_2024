@@ -3,15 +3,18 @@
 import 'package:flutter/material.dart';
 
 class AddEventScreen extends StatefulWidget {
-  final DateTime selectedDate; // 選択された日付を受け取る
+  final DateTime selectedDate; // 選択された日付が入る変数
 
-  AddEventScreen({required this.selectedDate});
+  AddEventScreen({
+    required this.selectedDate
+    });
 
   @override
   _AddEventScreenState createState() => _AddEventScreenState();
 }
 
 class _AddEventScreenState extends State<AddEventScreen> {
+  // 各項目用のテキストコントローラー
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
@@ -73,8 +76,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
+            // 保存ボタン
             ElevatedButton(
               onPressed: () {
+                // タイトルの入力があった場合のみ保存可能
                 if (_titleController.text.isNotEmpty) {
                   final newEvent = {
                     'title': _titleController.text,
@@ -85,7 +90,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     'date': widget.selectedDate.toIso8601String(),
                   };
                   Navigator.pop(context, newEvent); // 入力データを戻す
-                  //Navigator.pop(context, _titleController.text); // 入力値を返す
                 }
               },
               child: Text('保存'),

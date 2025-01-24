@@ -1,4 +1,4 @@
-/* cloud firestore へ情報を保存するための関数 */
+/* cloud firestore へ情報を保存、更新、削除するための関数 */
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -15,11 +15,11 @@ class FirestoreService {
       return data;
     }).toList();
     } catch (e) {
-      print('Firestoreからのデータ取得中にエラー: $e');
+      print('Firestoreからのデータ取得中にエラー: $e');// デバッグ文
       return [];
     }
   }
-  // イベント情報をFirestoreへ保存
+  // イベント情報を保存
   Future<DocumentReference<Map<String, dynamic>>> addEvent(Map<String, dynamic> event) async {
     final docRef = FirebaseFirestore.instance.collection('events').doc(); // ドキュメント参照を生成
     await docRef.set({
@@ -29,14 +29,15 @@ class FirestoreService {
     return docRef; // ドキュメント参照を返す
   }
 
-  // イベントの更新
+  // イベント情報の更新
   Future<void> updateEvent(String eventId, Map<String, dynamic> updatedData) async {
     await FirebaseFirestore.instance
         .collection('events')
         .doc(eventId)
         .update(updatedData);
   }
-  // イベントの削除
+
+  // イベント情報の削除
   Future<void> deleteEvent(String eventId) async {
     await FirebaseFirestore.instance
         .collection('events')
